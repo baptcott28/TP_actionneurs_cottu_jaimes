@@ -54,3 +54,29 @@ L'appel de la fonction `void motor_set_speed(int *speed)` est conditionée par l
 				motor_set_speed(speed);
 			}
 ```
+#### Montée naïve du rapport cyclique
+Cette montée naïve est réalisée lorsque l'on veut mettre directement la bonne valeur du rapport cyclique dans les PWMs du moteur. Cela induit un appel de courant trop important de la part du moteur ce qui à pour effet de mettre en échec le hacheur. 
+```C
+	TIM1->CCR1=res;
+	TIM1->CCR2=SPEED_MAX-res;
+	HAL_TIM_PWM_Init(&htim1);
+	motor_start_PWM();
+```
+
+#### Montée prograssive du rapport cyclique
+
+L'idée est d'incrémenter le raport cyclique de 5% toutes les 300ms. Si jamais le rapport cyclique devait être la valeur maximale autorisée, alors, le moteur mettrait 6 secondes à atteindre sa vitesse maximale ce qui semble être une durée convenable et qui permet certainement de limiter les appels de courant. Ceci est permit en remplacant les 4 lignes précedentes par le morceau de code suivant dans la fonction `void motor_set_speed(int *speed)` :
+```C
+while(raport_cyclique<res){
+		TIM1->CCR1=rapport_cyclique;
+		TIM1->CCR2=SPEED_MAX-rapport_cyclique;
+		HAL_TIM_PWM_Init(&htim1);
+		motor_start_PWM();
+		HAL_Delay(300);
+		rapport_cyclique=rapport_cyclique+87;
+	}
+	TIM1->CCR1=res;
+	TIM1->CCR2=SPEED_MAX-res;
+	HAL_TIM_PWM_Init(&htim1);
+	motor_start_PWM();
+```
