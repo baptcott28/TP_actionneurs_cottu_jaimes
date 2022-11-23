@@ -1,0 +1,3 @@
+../Core/Src/motor_cmd.c:24:6:motor_start	8	static
+../Core/Src/motor_cmd.c:33:6:motor_start_PWM	8	static
+../Core/Src/motor_cmd.c:44:6:motor_set_speed	32	static

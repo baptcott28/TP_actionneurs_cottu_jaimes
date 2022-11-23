@@ -14,6 +14,7 @@
  * in the root directory of this software component.
  * If no LICENSE file comes with this software, it is provided AS-IS.
  *
+ * Modifications : Baptiste Cottu, Diego Jaimes
  ******************************************************************************
  */
 /* USER CODE END Header */
@@ -24,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include <stdio.h>
+#include "motor_cmd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,16 +35,16 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_TX_BUFFER_SIZE 64
-#define UART_RX_BUFFER_SIZE 1
-#define CMD_BUFFER_SIZE 64
-#define MAX_ARGS 9
+#define UART_TX_BUFFER_SIZE 64			//!< Taille du buffer de transmission UART
+#define UART_RX_BUFFER_SIZE 1			//!< Taille du buffer de reception (traité sur interruption donc caractère par caractère
+#define CMD_BUFFER_SIZE 64				//!< Taille du buffer de commandes
 // LF = line feed, saut de ligne
-#define ASCII_LF 0x0A
+#define ASCII_LF 0x0A					//!< Code ASCII du saut de ligne
 // CR = carriage return, retour chariot
-#define ASCII_CR 0x0D
+#define ASCII_CR 0x0D					//!< Code ASCII du retour chariot
 // DEL = delete
-#define ASCII_DEL 0x7F
+#define ASCII_DEL 0x7F					//!< Code ASCII du caractère DEL
+#define MAX_ARGS 9
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,31 +54,34 @@
 
 /* Private variables ---------------------------------------------------------*/
 TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-uint8_t prompt[]="user@Nucleo-STM32G474>>";
-uint8_t started[]=
+uint8_t prompt[]="user@Nucleo-STM32G474>>";				//!< Mise en page de l'affichage console
+uint8_t started[]=										//!< Message de bienvenue
 		"\r\n*-----------------------------*"
 		"\r\n| Welcome on Nucleo-STM32G474 |"
 		"\r\n*-----------------------------*"
 		"\r\n";
-uint8_t newline[]="\r\n";
-uint8_t cmdNotFound[]="Command not found\r\n\n";
-const uint8_t help[]="\r\n Help : Liste des commandes"
+uint8_t newline[]="\r\n";								//!< Mise en page de l'affichage console
+uint8_t cmdNotFound[]="Command not found\r\n\n";		//!< Retour d'erreur
+const uint8_t help[]="\r\n Help : Liste des commandes"						//!< Liste des commandes disponibles
 		"\r\n pinout : Affiche toutes les broches connectées et leur fonction"
 		"\r\n start : Allume l'étage de puissance du moteur"
 		"\r\n stop : Eteind l'étage de puissance du moteur"
 		"\r\n Toute autre commande renverra un message d'erreur\r\n\n";
-const uint8_t start[]="Power ON\r\n\n";
-const uint8_t stop[]="Power OFF\r\n\n";
-const uint8_t pinout[]=" \r\n PC13 : User button"
+const uint8_t pinout[]=" \r\n PC13 : User button"		//!< Liste des pin utilisées pour le montage
 		"\r\n PA5 : User led"
 		"\r\n PC3 : ISO_reset\r\n\n";
-uint32_t uartRxReceived;
-uint8_t uartRxBuffer[UART_RX_BUFFER_SIZE];
-uint8_t uartTxBuffer[UART_TX_BUFFER_SIZE];
+const uint8_t start[]="Power ON\r\n\n";					//!< Retour d'information utilisateur
+const uint8_t stop[]="Power OFF\r\n\n";					//!< Retour d'information utilisateur
+const uint8_t speed_msg[]="speed set_Ok";				//!< Retour d'information utilisateur
+int speed[SPEED_MAX_DIGIT];							//!< Buffer contenant les digits de la commande de vitesse moteur
+uint32_t uartRxReceived;								//!< Flag de réception d'un caractère
+uint8_t uartRxBuffer[UART_RX_BUFFER_SIZE];				//!< Définition du buffer de reception
+uint8_t uartTxBuffer[UART_TX_BUFFER_SIZE];				//!< Définition du buffer de transmission
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -84,6 +89,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -95,12 +101,13 @@ static void MX_USART2_UART_Init(void);
 
 /**
   * @brief  The application entry point.
+  * Fonction de gestion de l'interface utilisateur : gestion du shell et du traitement des commandes.
   * @retval int
   */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	char	 	cmdBuffer[CMD_BUFFER_SIZE];
+	char	 	cmdBuffer[CMD_BUFFER_SIZE];		//!< Contient la commande reconstruite apres chaque interruption UART
 	int 		idx_cmd;
 	char* 		argv[MAX_ARGS];
 	int		 	argc = 0;
@@ -128,11 +135,8 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_USART2_UART_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
-	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
 
 	memset(argv,NULL,MAX_ARGS*sizeof(char*));
 	memset(cmdBuffer,NULL,CMD_BUFFER_SIZE*sizeof(char));
@@ -202,6 +206,7 @@ int main(void)
 			else if(strcmp(argv[0],"start")==0)
 			{
 				HAL_UART_Transmit(&huart2, start, sizeof(start), HAL_MAX_DELAY);
+				motor_start();
 			}
 			else if(strcmp(argv[0],"stop")==0)
 			{
@@ -210,6 +215,14 @@ int main(void)
 			else if(strcmp(argv[0],"help")==0)
 			{
 				HAL_UART_Transmit(&huart2, help, sizeof(help), HAL_MAX_DELAY);
+			}
+			else if(strncmp(argv[0],"speed=",6)==0)
+			{
+				HAL_UART_Transmit(&huart2,speed_msg, sizeof(speed_msg), HAL_MAX_DELAY);
+				for(int i=0;i<SPEED_MAX_DIGIT+1;i++){
+					speed[i]=cmdBuffer[i+6];					// i+6 car les 6 premiers caracteres sont "speed="
+				}
+				motor_set_speed(speed);
 			}
 			else{
 				HAL_UART_Transmit(&huart2, cmdNotFound, sizeof(cmdNotFound), HAL_MAX_DELAY);
@@ -224,7 +237,7 @@ int main(void)
   /* USER CODE END 3 */
 }
 
-/**
+/*
   * @brief System Clock Configuration
   * @retval None
   */
@@ -233,11 +246,11 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage
+  /* Configure the main internal regulator output voltage
   */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST);
 
-  /** Initializes the RCC Oscillators according to the specified parameters
+  /* Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
@@ -255,7 +268,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 
-  /** Initializes the CPU, AHB and APB buses clocks
+  /* Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -270,7 +283,7 @@ void SystemClock_Config(void)
   }
 }
 
-/**
+/*
   * @brief TIM1 Initialization Function
   * @param None
   * @retval None
@@ -347,7 +360,52 @@ static void MX_TIM1_Init(void)
 
 }
 
-/**
+/*
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 170;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 2;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/*
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -395,7 +453,7 @@ static void MX_USART2_UART_Init(void)
 
 }
 
-/**
+/*
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -442,13 +500,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/**
+ * \fn void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart)
+ * \brief Gestion des interruptions des périphériques UART:
+ * Met le flag de réception a 1 et met le caractère reçu dans uartRxBuffer
+ */
 void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart){
 	uartRxReceived = 1;
 	HAL_UART_Receive_IT(&huart2, uartRxBuffer, UART_RX_BUFFER_SIZE);
 }
 /* USER CODE END 4 */
 
-/**
+/*
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
@@ -461,6 +525,35 @@ void Error_Handler(void)
 	{
 	}
   /* USER CODE END Error_Handler_Debug */
+}
+
+/**
+ * \fn void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+ * \brief Gestion des interruptions des timers :
+ * Désactive le timer 2 et remet la Pin ISO_RESET lorsque le tim2 déclenche son interruption.
+ * Termine la séquence d'allumage en démarrant les PWM
+ */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	if(htim==&htim2){
+		HAL_TIM_Base_Stop_IT(&htim2);
+		HAL_GPIO_WritePin(ISO_RESET_GPIO_Port,ISO_RESET_Pin,0);
+
+		//Start les PWM moteurs
+		motor_start_PWM();
+	}
+	//start PWM
+
+}
+
+/**
+ * \fn void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+ * \brief Gestion des interruptions GPÏO_EXTI :
+ * Déclenche la procédure d'allumage du moteur sur appui du bouton utilisateur
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(GPIO_Pin==BUTTON_Pin){
+		motor_start();
+	}
 }
 
 #ifdef  USE_FULL_ASSERT
