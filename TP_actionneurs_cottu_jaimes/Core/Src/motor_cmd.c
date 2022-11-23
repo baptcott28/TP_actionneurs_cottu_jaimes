@@ -37,6 +37,9 @@ void motor_stop_PWM(void){
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
+	TIM1->CCR1=660;
+	TIM1->CCR2=SPEED_MAX-660;
+	HAL_TIM_PWM_Init(&htim1);
 }
 
 /**
@@ -57,22 +60,23 @@ void motor_start_PWM(void){
  */
 void motor_set_speed(char *speed){
 	printf("motor_speed_entered\r\n");
-	int res=0;													// atoi = ASCII string to the integer value represented by the string
-	//int rapport_cyclique=MONTEE_CINQ_POURCENT; 							//!< Rapport cyclique initial à 5%
+	int res=0;															// atoi = ASCII string to the integer value represented by the string
+	//int rapport_cyclique=MONTEE_CINQ_POURCENT; 						//!< Rapport cyclique initial à 5%
 	int digit=1;
 	for(int i=0;i<SPEED_MAX_DIGIT;i++){
-		res=res+((speed[SPEED_MAX_DIGIT-i-1])*digit);					//!< reconstitution de la valeur décimale a partir des digits
+		res=res+(((int)(speed[SPEED_MAX_DIGIT-i-1]))*digit);					//!< reconstitution de la valeur décimale a partir des digits
 		digit=digit*10;
 	}
-	printf("res : %d\r\n",res);
 	if(res>SPEED_MAX){
 		res=SPEED_MAX;
 	}
+	printf("consigne appliquée : %d\r\n",res);								// verification de res dans la console
+
 	//methode bourin
 	TIM1->CCR1=res;
 	TIM1->CCR2=SPEED_MAX-res;
 	HAL_TIM_PWM_Init(&htim1);
-	//motor_start_PWM();
+	motor_start_PWM();
 
 	/*// methode gradation du rapport cyclique
 	while(raport_cyclique<res){

@@ -154,8 +154,8 @@ int main(void)
 	TIM1->CCR2=SPEED_MAX-660;
 
 	/*speed[0]=1;
-	speed[1]=2;
-	speed[2]=3;
+	speed[1]=8;
+	speed[2]=9;
 	speed[3]=4;
 	motor_set_speed(speed);*/
 
