@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "motor_cmd.h"
 /* USER CODE END Includes */
 
@@ -77,8 +78,8 @@ const uint8_t pinout[]=" \r\n PC13 : User button"		//!< Liste des pin utilisées
 		"\r\n PC3 : ISO_reset\r\n\n";
 const uint8_t start[]="Power ON\r\n\n";					//!< Retour d'information utilisateur
 const uint8_t stop[]="Power OFF\r\n\n";					//!< Retour d'information utilisateur
-const uint8_t speed_msg[]="speed set_Ok";				//!< Retour d'information utilisateur
-int speed[SPEED_MAX_DIGIT];							//!< Buffer contenant les digits de la commande de vitesse moteur
+const uint8_t speed_msg[]="speed set_Ok\r\n\n";				//!< Retour d'information utilisateur
+char speed[SPEED_MAX_DIGIT];							//!< Buffer contenant les digits de la commande de vitesse moteur
 uint32_t uartRxReceived;								//!< Flag de réception d'un caractère
 uint8_t uartRxBuffer[UART_RX_BUFFER_SIZE];				//!< Définition du buffer de reception
 uint8_t uartTxBuffer[UART_TX_BUFFER_SIZE];				//!< Définition du buffer de transmission
@@ -138,15 +139,27 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-	memset(argv,NULL,MAX_ARGS*sizeof(char*));
-	memset(cmdBuffer,NULL,CMD_BUFFER_SIZE*sizeof(char));
-	memset(uartRxBuffer,NULL,UART_RX_BUFFER_SIZE*sizeof(char));
-	memset(uartTxBuffer,NULL,UART_TX_BUFFER_SIZE*sizeof(char));
+	memset(argv,(int)NULL,MAX_ARGS*sizeof(char*));
+	memset(cmdBuffer,(int)NULL,CMD_BUFFER_SIZE*sizeof(char));
+	memset(uartRxBuffer,(int)NULL,UART_RX_BUFFER_SIZE*sizeof(char));
+	memset(uartTxBuffer,(int)NULL,UART_TX_BUFFER_SIZE*sizeof(char));
 
 	HAL_UART_Receive_IT(&huart2, uartRxBuffer, UART_RX_BUFFER_SIZE);
 	HAL_Delay(10);
 	HAL_UART_Transmit(&huart2, started, sizeof(started), HAL_MAX_DELAY);
 	HAL_UART_Transmit(&huart2, prompt, sizeof(prompt), HAL_MAX_DELAY);
+
+	TIM1->CCR1=870;
+	TIM1->CCR2=SPEED_MAX-870;
+	motor_start();
+	//motor_stop();
+
+	/*speed[0]=1;
+	speed[1]=2;
+	speed[2]=3;
+	speed[3]=4;
+	motor_set_speed(speed);*/
+
 
   /* USER CODE END 2 */
 
@@ -154,7 +167,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		// uartRxReceived is set to 1 when a new character is received on uart 1
+		motor_start();
+		HAL_Delay(100);
+		/*// uartRxReceived is set to 1 when a new character is received on uart 1
 		if(uartRxReceived){
 			switch(uartRxBuffer[0]){
 			// Nouvelle ligne, instruction à traiter
@@ -219,8 +234,9 @@ int main(void)
 			else if(strncmp(argv[0],"speed=",6)==0)
 			{
 				HAL_UART_Transmit(&huart2,speed_msg, sizeof(speed_msg), HAL_MAX_DELAY);
-				for(int i=0;i<SPEED_MAX_DIGIT+1;i++){
+				for(int i=0;i<SPEED_MAX_DIGIT;i++){
 					speed[i]=cmdBuffer[i+6];					// i+6 car les 6 premiers caracteres sont "speed="
+					printf("boucle speed\t speed[%d]=cmdBuffer[%d](%d)\r\n",i,i+6,cmdBuffer[i+6]);
 				}
 				motor_set_speed(speed);
 			}
@@ -229,7 +245,8 @@ int main(void)
 			}
 			HAL_UART_Transmit(&huart2, prompt, sizeof(prompt), HAL_MAX_DELAY);
 			newCmdReady = 0;
-		}
+		}*/
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -541,7 +558,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		//Start les PWM moteurs
 		motor_start_PWM();
 	}
-	//start PWM
 
 }
 
@@ -554,6 +570,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin==BUTTON_Pin){
 		motor_start();
 	}
+}
+
+int __io_putchar(int ch){
+	HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+	return ch;
 }
 
 #ifdef  USE_FULL_ASSERT
