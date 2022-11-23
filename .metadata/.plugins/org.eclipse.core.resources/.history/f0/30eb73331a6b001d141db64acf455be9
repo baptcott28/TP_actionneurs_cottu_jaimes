@@ -44,6 +44,8 @@ void motor_stop_PWM(void){
  * \brief Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois
  */
 void motor_start_PWM(void){
+	TIM1->CCR1=660;
+	TIM1->CCR2=SPEED_MAX-660;
 	printf("start_PWM\r\n");
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);

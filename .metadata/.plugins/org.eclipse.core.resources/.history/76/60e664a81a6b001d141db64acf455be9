@@ -234,7 +234,6 @@ int main(void)
 				HAL_UART_Transmit(&huart2,speed_msg, sizeof(speed_msg), HAL_MAX_DELAY);
 				for(int i=0;i<SPEED_MAX_DIGIT;i++){
 					speed[i]=cmdBuffer[i+6];					// i+6 car les 6 premiers caracteres sont "speed=" donc osef
-					//speed contient les digits de la vitesse
 					printf("boucle speed\t speed[%d]=cmdBuffer[%d](%d)\r\n",i,i+6,cmdBuffer[i+6]);
 				}
 				motor_set_speed(speed);

@@ -23,7 +23,6 @@ extern char speed[SPEED_MAX_DIGIT];
  * \brief Démarre le timer 2 et met la Pin ISO_RESET à 1 pendant le temps requis (2us). Le reset de ISO_RESET se fait dans l'interruption de tim2
  */
 void motor_start(void){
-	motor_stop_PWM();
 	printf("moteur start entered\r\n");
 	HAL_GPIO_WritePin(ISO_RESET_GPIO_Port,ISO_RESET_Pin,1);
 	HAL_Delay(1);
@@ -44,7 +43,6 @@ void motor_stop_PWM(void){
  * \brief Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois
  */
 void motor_start_PWM(void){
-	printf("start_PWM\r\n");
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
