@@ -16,11 +16,13 @@
 
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
+extern ADC_HandleTypeDef hadc1;
 
+uint8_t current=0;
 
 /**
  * \fn void motor_start(void)
- * \brief Démarre le timer 2 et met la Pin ISO_RESET à 1 pendant le temps requis (2us). Le reset de ISO_RESET se fait dans l'interruption de tim2
+ * \brief Met la Pin ISO_RESET à 1 pendant le temps requis (1ms).
  */
 void motor_start(void){
 	motor_stop_PWM();
@@ -31,14 +33,19 @@ void motor_start(void){
 	motor_start_PWM();
 }
 
+/**
+  * \fn void motor_stop_PWM(void)
+  * \brief Etteint toutes les PWM du moteur, et remet les valeur standarts (rapport cyclique de 660)
+  *
+  */
 void motor_stop_PWM(void){
 	//printf("moteur_stop_entered\r\n");						// debogage
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
-	TIM1->CCR1=660;
-	TIM1->CCR2=SPEED_MAX-660;
+	TIM1->CCR1=850;
+	TIM1->CCR2=SPEED_MAX-850;
 	HAL_TIM_PWM_Init(&htim1);
 }
 
@@ -56,7 +63,10 @@ void motor_start_PWM(void){
 
 /**
  * \fn void motor_set_speed(int *speed)
- * \brief Récupère et traite la commande de vitesse du moteur
+ * \brief Récupère et traite la commande de vitesse du moteur. Il y a une méthode bourin, qui met directement le rapport cyclique voulu
+ * dans les registres, mais qui cause un 'HALL OVERCURRENT'.
+ *
+ * La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur.
  */
 void motor_set_speed(int speed){
 	//printf("motor_speed_entered\r\n");							// debogage
@@ -66,7 +76,7 @@ void motor_set_speed(int speed){
 	else if (speed<0){
 		speed=0;
 	}
-	printf("consigne appliquée : %d\r\n",speed);				// debogage
+	//printf("consigne appliquée : %d\r\n",speed);				// debogage
 
 	/*//---------methode bourin--------
 	TIM1->CCR1=speed;
@@ -103,4 +113,22 @@ void motor_set_speed(int speed){
 			rapport_cyclique=rapport_cyclique-GRADATION_UN_POURCENT;
 		}
 	}
+}
+
+void motor_get_current(void){
+	printf("motor_get_current_entered\r\n");
+	int rapport_cyclique= TIM1->CCR1;
+	while((TIM1->CNT)<(rapport_cyclique/2)){
+	}
+	HAL_ADC_Start(&hadc1);
+
+	if(HAL_ADC_PollForConversion(&hadc1, 100)==HAL_OK){
+		//printf("poll for conv bien passé\r\n");
+	}
+	else{
+		printf("Echec poll for conversion\r\n");
+	}
+	current=HAL_ADC_GetValue(&hadc1);
+	float real_current=(0.009*current);
+	printf("Current : %f \r\n",real_current);
 }
