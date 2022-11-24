@@ -79,7 +79,6 @@ const uint8_t pinout[]=" \r\n PC13 : User button"		//!< Liste des pin utilisées
 const uint8_t start[]="Power ON\r\n\n";					//!< Retour d'information utilisateur
 const uint8_t stop[]="Power OFF\r\n\n";					//!< Retour d'information utilisateur
 const uint8_t speed_msg[]="speed set_Ok\r\n\n";				//!< Retour d'information utilisateur
-char speed[SPEED_MAX_DIGIT];							//!< Buffer contenant les digits de la commande de vitesse moteur
 uint32_t uartRxReceived;								//!< Flag de réception d'un caractère
 uint8_t uartRxBuffer[UART_RX_BUFFER_SIZE];				//!< Définition du buffer de reception
 uint8_t uartTxBuffer[UART_TX_BUFFER_SIZE];				//!< Définition du buffer de transmission
@@ -153,12 +152,6 @@ int main(void)
 	TIM1->CCR1=660;
 	TIM1->CCR2=SPEED_MAX-660;
 
-	/*speed[0]=1;
-	speed[1]=8;
-	speed[2]=9;
-	speed[3]=4;
-	motor_set_speed(speed);*/
-
 
   /* USER CODE END 2 */
 
@@ -229,14 +222,11 @@ int main(void)
 			{
 				HAL_UART_Transmit(&huart2, help, sizeof(help), HAL_MAX_DELAY);
 			}
-			else if(strncmp(argv[0],"speed=",6)==0)
+			else if(strcmp(argv[0],"speed")==0)
 			{
 				HAL_UART_Transmit(&huart2,speed_msg, sizeof(speed_msg), HAL_MAX_DELAY);
-				for(int i=0;i<SPEED_MAX_DIGIT;i++){
-					speed[i]=cmdBuffer[i+6];					// i+6 car les 6 premiers caracteres sont "speed=" donc osef
-					//speed contient les digits de la vitesse
-					printf("boucle speed\t speed[%d]=cmdBuffer[%d](%d)\r\n",i,i+6,cmdBuffer[i+6]);
-				}
+				int speed;
+				speed=atoi(argv[1]);
 				motor_set_speed(speed);
 			}
 			else{

@@ -16,7 +16,6 @@
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 
-extern char speed[SPEED_MAX_DIGIT];
 
 /**
  * \fn void motor_start(void)
@@ -58,23 +57,19 @@ void motor_start_PWM(void){
  * \fn void motor_set_speed(int *speed)
  * \brief Récupère et traite la commande de vitesse du moteur
  */
-void motor_set_speed(char *speed){
+void motor_set_speed(int speed){
 	printf("motor_speed_entered\r\n");
-	int res=0;															// atoi = ASCII string to the integer value represented by the string
-	//int rapport_cyclique=MONTEE_CINQ_POURCENT; 						//!< Rapport cyclique initial à 5%
-	int digit=1;
-	for(int i=0;i<SPEED_MAX_DIGIT;i++){
-		res=res+(((int)(speed[SPEED_MAX_DIGIT-i-1]))*digit);					//!< reconstitution de la valeur décimale a partir des digits
-		digit=digit*10;
+	if(speed>SPEED_MAX){
+		speed=SPEED_MAX;
 	}
-	if(res>SPEED_MAX){
-		res=SPEED_MAX;
+	else if (speed<0){
+		speed=0;
 	}
-	printf("consigne appliquée : %d\r\n",res);								// verification de res dans la console
+	printf("consigne appliquée : %d\r\n",speed);								// verification de res dans la console
 
 	//methode bourin
-	TIM1->CCR1=res;
-	TIM1->CCR2=SPEED_MAX-res;
+	TIM1->CCR1=speed;
+	TIM1->CCR2=SPEED_MAX-speed;
 	HAL_TIM_PWM_Init(&htim1);
 	motor_start_PWM();
 
