@@ -68,13 +68,13 @@ void motor_set_speed(int speed){
 	}
 	printf("consigne appliquée : %d\r\n",speed);				// debogage
 
-	/*//---------methode bourin--------
+	/*//methode bourin
 	TIM1->CCR1=speed;
 	TIM1->CCR2=SPEED_MAX-speed;
 	HAL_TIM_PWM_Init(&htim1);
 	motor_start_PWM();*/
 
-	//----- methode gradation du rapport cyclique -----
+	// methode gradation du rapport cyclique
 	int rapport_cyclique=0;
 
 	// en montée

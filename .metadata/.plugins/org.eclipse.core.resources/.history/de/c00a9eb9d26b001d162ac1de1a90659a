@@ -24,7 +24,7 @@ extern TIM_HandleTypeDef htim2;
  */
 void motor_start(void){
 	motor_stop_PWM();
-	//printf("moteur start entered\r\n");						// debogage
+	printf("moteur start entered\r\n");
 	HAL_GPIO_WritePin(ISO_RESET_GPIO_Port,ISO_RESET_Pin,1);
 	HAL_Delay(1);
 	HAL_GPIO_WritePin(ISO_RESET_GPIO_Port,ISO_RESET_Pin,0);
@@ -68,13 +68,13 @@ void motor_set_speed(int speed){
 	}
 	printf("consigne appliquée : %d\r\n",speed);				// debogage
 
-	/*//---------methode bourin--------
+	/*//methode bourin
 	TIM1->CCR1=speed;
 	TIM1->CCR2=SPEED_MAX-speed;
 	HAL_TIM_PWM_Init(&htim1);
 	motor_start_PWM();*/
 
-	//----- methode gradation du rapport cyclique -----
+	// methode gradation du rapport cyclique
 	int rapport_cyclique=0;
 
 	// en montée
@@ -83,7 +83,6 @@ void motor_set_speed(int speed){
 		while(rapport_cyclique<speed){
 			TIM1->CCR1=rapport_cyclique;
 			TIM1->CCR2=SPEED_MAX-rapport_cyclique;
-			printf("rapport_cyclique : %d\r\n",rapport_cyclique);
 			HAL_TIM_PWM_Init(&htim1);
 			motor_start_PWM();
 			HAL_Delay(DELAY_GRADATION);
@@ -96,7 +95,6 @@ void motor_set_speed(int speed){
 		while(rapport_cyclique>speed){
 			TIM1->CCR1=rapport_cyclique;
 			TIM1->CCR2=SPEED_MAX-rapport_cyclique;
-			printf("rapport_cyclique : %d\r\n",rapport_cyclique);
 			HAL_TIM_PWM_Init(&htim1);
 			motor_start_PWM();
 			HAL_Delay(DELAY_GRADATION);

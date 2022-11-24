@@ -24,7 +24,7 @@ extern TIM_HandleTypeDef htim2;
  */
 void motor_start(void){
 	motor_stop_PWM();
-	//printf("moteur start entered\r\n");						// debogage
+	printf("moteur start entered\r\n");
 	HAL_GPIO_WritePin(ISO_RESET_GPIO_Port,ISO_RESET_Pin,1);
 	HAL_Delay(1);
 	HAL_GPIO_WritePin(ISO_RESET_GPIO_Port,ISO_RESET_Pin,0);
@@ -32,7 +32,7 @@ void motor_start(void){
 }
 
 void motor_stop_PWM(void){
-	//printf("moteur_stop_entered\r\n");						// debogage
+	printf("moteur_stop_entered\r\n");
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
@@ -47,7 +47,7 @@ void motor_stop_PWM(void){
  * \brief Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois
  */
 void motor_start_PWM(void){
-	//printf("start_PWM\r\n");									// debogage
+	printf("start_PWM\r\n");
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
@@ -59,22 +59,22 @@ void motor_start_PWM(void){
  * \brief Récupère et traite la commande de vitesse du moteur
  */
 void motor_set_speed(int speed){
-	//printf("motor_speed_entered\r\n");							// debogage
+	printf("motor_speed_entered\r\n");
 	if(speed>SPEED_MAX){
 		speed=SPEED_MAX;
 	}
 	else if (speed<0){
 		speed=0;
 	}
-	printf("consigne appliquée : %d\r\n",speed);				// debogage
+	printf("consigne appliquée : %d\r\n",speed);								// verification de res dans la console
 
-	/*//---------methode bourin--------
+	/*//methode bourin
 	TIM1->CCR1=speed;
 	TIM1->CCR2=SPEED_MAX-speed;
 	HAL_TIM_PWM_Init(&htim1);
 	motor_start_PWM();*/
 
-	//----- methode gradation du rapport cyclique -----
+	// methode gradation du rapport cyclique
 	int rapport_cyclique=0;
 
 	// en montée
@@ -83,10 +83,9 @@ void motor_set_speed(int speed){
 		while(rapport_cyclique<speed){
 			TIM1->CCR1=rapport_cyclique;
 			TIM1->CCR2=SPEED_MAX-rapport_cyclique;
-			printf("rapport_cyclique : %d\r\n",rapport_cyclique);
 			HAL_TIM_PWM_Init(&htim1);
 			motor_start_PWM();
-			HAL_Delay(DELAY_GRADATION);
+			HAL_Delay(400);
 			rapport_cyclique=rapport_cyclique+GRADATION_UN_POURCENT;
 		}
 	}
@@ -96,10 +95,9 @@ void motor_set_speed(int speed){
 		while(rapport_cyclique>speed){
 			TIM1->CCR1=rapport_cyclique;
 			TIM1->CCR2=SPEED_MAX-rapport_cyclique;
-			printf("rapport_cyclique : %d\r\n",rapport_cyclique);
 			HAL_TIM_PWM_Init(&htim1);
 			motor_start_PWM();
-			HAL_Delay(DELAY_GRADATION);
+			HAL_Delay(400);
 			rapport_cyclique=rapport_cyclique-GRADATION_UN_POURCENT;
 		}
 	}

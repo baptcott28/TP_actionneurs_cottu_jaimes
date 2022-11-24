@@ -1,4 +1,4 @@
-../Core/Src/motor_cmd.c:24:6:motor_start	8	static
-../Core/Src/motor_cmd.c:33:6:motor_stop_PWM	8	static
-../Core/Src/motor_cmd.c:48:6:motor_start_PWM	8	static
-../Core/Src/motor_cmd.c:60:6:motor_set_speed	16	static
+../Core/Src/motor_cmd.c:25:6:motor_start	8	static
+../Core/Src/motor_cmd.c:34:6:motor_stop_PWM	8	static
+../Core/Src/motor_cmd.c:49:6:motor_start_PWM	8	static
+../Core/Src/motor_cmd.c:61:6:motor_set_speed	24	static

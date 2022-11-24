@@ -1415,3 +1415,15 @@ java.net.UnknownHostException: sw-center.st.com
 
 !ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2022-11-24 08:48:50.274
 !MESSAGE Existing sessions are:
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2022-11-24 09:14:15.536
+!MESSAGE Error - No active DSF-Session. tmpSessionId = 23 (contextManager row 121)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2022-11-24 09:14:15.536
+!MESSAGE Existing sessions are:
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2022-11-24 09:14:15.536
+!MESSAGE Error - No active DSF-Session. tmpSessionId = 23 (contextManager row 121)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2022-11-24 09:14:15.536
+!MESSAGE Existing sessions are:
