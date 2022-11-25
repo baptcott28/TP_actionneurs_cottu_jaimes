@@ -1,5 +1,3 @@
-# inclure doxygen et la photo sur la clé
-
 # TP_actionneurs_cottu_jaimes
  
 Nous implémentons le shell disponible avec les commandes start, stop,pinout et help. On teste les nouvelles fonctionnalitées qui remplissent bien leur rôle d'affichage.
@@ -39,7 +37,7 @@ Le dead time est calculé via l'horlage du SysClock. Nous mettons une valeur de 
 
 ## Vérification des commandes à l'oscilloscope
 
-
+![Commande décallée](https://github.com/baptcott28/TP_actionneurs_cottu_jaimes/blob/main/TP_actionneurs_cottu_jaimes/Commande%20d%C3%A9cal%C3%A9e.png)
 
 # Séquence de démarage du hacheur
 
