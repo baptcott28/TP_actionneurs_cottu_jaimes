@@ -154,4 +154,4 @@ On lance ensuite la conversion en enchainant les trois instructions suivantes. O
 	current=HAL_ADC_GetValue(&hadc1);
 ```
 
-Finalement, on essaie de transformer la valeur de sortie de l'ADC en courant à l'aide d'une opération de proportionalité. En testant cette fonction, elle nous renvoie bien une valeur sortante de l'ADC, mais la conversion de cette valeur en courant n'est pas être bonne. 
+Finalement, on essaie de transformer la valeur de sortie de l'ADC en courant à l'aide d'une opération de proportionalité. En testant cette fonction, elle nous renvoie bien une valeur sortante de l'ADC, mais la conversion de cette valeur en courant n'est pas bonne. 
