@@ -1,4 +1,4 @@
-# INCLURE LA DOC DOXYGEN
+# inclure doxygen et la photo sur la clé
 
 # TP_actionneurs_cottu_jaimes
  
@@ -14,11 +14,11 @@ Nous implémentons le shell disponible avec les commandes start, stop,pinout et 
 
 
 
-# Plan des PIN :
+# Plan des pin :
 
-Le hacheur dispose d'un connecteur 37 pin. On identifie deja la Pin ISO_RESET (Pin 33) par laquelle on va allumer le hacheur a connecter avec PC13. On branche la masse de la carte sur la pin ISO_GND (Pin 36) et le 5V de la carte sur la pin ISO_5V (Pin 37).
+Le hacheur dispose d'un connecteur 37 pin. On identifie deja la Pin ISO_RESET (Pin 33) par laquelle on va allumer le hacheur, à connecter sur  PC13. On branche la masse de la carte sur la pin ISO_GND (Pin 36) et le 5V de la carte sur la pin ISO_5V (Pin 37).
 
-On choisit ensuite deux phase sur 3, sur lesquelles on branche les deux PWM génerées. on procède donc comme suit :
+On choisit ensuite deux phases sur 3, sur lesquelles on branche les deux PWM génerées. On procède donc comme suit :
 - CMD_B_TOP (Pin 11) sur TIM1_CH1 (PA8)
 - CMD_Y_TOP (Pin 12) sur TIM1_CH2 (PA9)
 - CMD_B_BOT (Pin 29) sur TIM1_CH1N (PA11)
@@ -27,11 +27,11 @@ On choisit ensuite deux phase sur 3, sur lesquelles on branche les deux PWM gén
 - Y_HALL (Pin 35) sur ADC1 (PA0)
 
 
-# Réglage des PWMs :
+# Réglage des PWM :
 
 ## En commande décallée avec résolution de 10 bits : 
 
-Nous devons avoir une résolution de 10 bit ce qui signifie une valeur d'ARR entre  511 et 1024. Pour avoir une fréquence finale de 16kHz, nous mettons l'ARR à 1750 et le PSC à 2. Plus tard, nous voudrons que la commande "start" mette le rapport cyclique a 50% ce qui équivaudra a une valeur de 875.
+Nous devons avoir une résolution de 10 bit ce qui signifie une valeur d'ARR entre  511 et 1024. Pour avoir une fréquence finale de 16kHz, nous mettons l'ARR à 1750 et le PSC à 2. Plus tard, nous voudrons que la commande "start" mette le rapport cyclique à 50% ce qui équivaudra à une valeur de 875.
 
 ## Réglage du Dead Time : 
 
@@ -43,7 +43,9 @@ Le dead time est calculé via l'horlage du SysClock. Nous mettons une valeur de 
 
 # Séquence de démarage du hacheur
 
-La pin qui permet le démarrage du hacheur est la pin ISO_RESET (Pin 33 sur le hacheur). Pour démarrer le hacheur, il faut respecter une certaine séquence, c'est à dire imposer un état haut sur cette pin pendant 2us au minimum avant de déclencher les PWMs. C'est le rôle de la fonction `void motor_start(void)`. Cette fonction met la pin à 1, crée un delay de 1 ms et remet la pin à 0. Il faut faire attention à ne pas mettre un délai trop long car le reset du hacheur ne fonctionne pas.  
+La pin qui permet le démarrage du hacheur est la pin ISO_RESET (Pin 33 sur le hacheur). Pour démarrer le hacheur, il faut respecter une certaine séquence, c'est à dire imposer un état haut sur cette pin pendant 2us au minimum avant de déclencher les PWMs. C'est le rôle de la fonction `void motor_start(void)`. Cette fonction met la pin à 1, crée un delay de 1 ms et remet la pin à 0. 
+
+ Il faut faire attention à ne pas mettre un délai trop long car le reset du hacheur ne fonctionne pas.  
 
 ## Démarage du moteur par appui sur le bouton utilisateur
 
@@ -79,7 +81,7 @@ On inclut ensuite une correction d'une potentielle erreur avec le code suivant. 
 ```
 
 ## Montée naïve du rapport cyclique
-Cette montée naïve est réalisée lorsque l'on veut mettre directement la bonne valeur du rapport cyclique dans les PWMs du moteur. Cela induit un appel de courant trop important de la part du moteur ce qui déclenche une mise en rideau du hacheur avec une 'FAULT OVERCURRENT'. 
+Cette montée naïve est réalisée lorsque l'on veut mettre directement la bonne valeur du rapport cyclique dans les PWMs du moteur. Cela induit un appel de courant trop important de la part du moteur ce qui déclenche une mise en rideau du hacheur avec un 'FAULT OVERCURRENT'. 
 
 ```C
     // ------ Methode bourin -------
@@ -91,7 +93,7 @@ Cette montée naïve est réalisée lorsque l'on veut mettre directement la bonn
 
 ## Montée prograssive du rapport cyclique
 
-L'idée est d'incrémenter le raport cyclique de 1% toutes les `DELAY_GRADATION` (en ms). Ceci est permit en remplacant les 4 lignes précedentes par le morceau de code suivant dans la fonction `void motor_set_speed(int *speed)`. On ajoute le même bloc pour la descente en vitesse a la suite. La seule chose qui change est la ligne 
+L'idée est d'incrémenter le raport cyclique de 1% toutes les `DELAY_GRADATION` (en ms). Ceci est permit en remplacant les 4 lignes précedentes par le morceau de code suivant dans la fonction `void motor_set_speed(int *speed)`. On ajoute le même bloc pour la descente en vitesse à la suite. La seule chose qui change est la ligne :
 
 `rapport_cyclique=rapport_cyclique-GRADATION_UN_POURCENT;`.
 
@@ -119,11 +121,11 @@ if (speed>rapport_cyclique){
 
 # Mesure du courant de phase Y
 
-Pour mesurer le courant passant dans le moteur, on décide de le mesurer sur la phase jaune, dont la sortie est sur la pin 35 du hacheur. Nous la branchons sur l'ADC1 (pin PA0). On paramètre l'ADC en `single-ended`, la résolution sur 8 bit comme ça la valeur renvoyée est directement au format d'un entier. 
+Pour mesurer le courant passant dans le moteur, on décide de le mesurer sur la phase jaune, dont la sortie est sur la pin 35 du hacheur. Nous la branchons sur l'ADC1 (pin PA0). On paramètre l'ADC en `single-ended`, et la résolution est paramétrée sur 8 bit pour que la valeur renvoyée soit directement au format d'un entier. 
 
 ## Ajout de la commande au shell
 
-Nous ajoutons ensuite la fonctionnalité `current` au shell, ce qui permet d'appeler la fonction `motor_get_current()`. Cette fonction met en oeuvre une mesure de un courant, et affiche la valeur. 
+Nous ajoutons ensuite la fonctionnalité `current` au shell, ce qui permet d'appeler la fonction `motor_get_current()`. Cette fonction met en oeuvre une mesure de un courant, et affiche la valeur dans la console. 
 
 ```C
 else if(strcmp(argv[0],"current")==0){
@@ -136,6 +138,7 @@ else if(strcmp(argv[0],"current")==0){
 Pour des questions de fiabilité de la mesure, il faut mesurer le courant entre deux fronts de PWM. Pour cela, on attend d'avoir atteint la demi-periode avant de déclencher une mesure. Ceci est fait avec la ligne 
 ```C 
 while((TIM1->CNT)<(rapport_cyclique/2)){
+    //Attente
 }
 ```
 
@@ -153,4 +156,4 @@ On lance ensuite la conversion en enchainant les trois instructions suivantes. O
 	current=HAL_ADC_GetValue(&hadc1);
 ```
 
-Finalement, on essaie de transformer cette valeur de sortie de l'ADC en courant à l'aide d'une opértion de proportionalité. En testant cette fonction, elle nous renvoie bin=en une valeur de l'ADC mais la conversion en une valeur de courant ne semble pas être la bonne. 
+Finalement, on essaie de transformer la valeur de sortie de l'ADC en courant à l'aide d'une opértion de proportionalité. En testant cette fonction, elle nous renvoie bien une valeur sortante de l'ADC, mais la conversion de cette valeur en un courant ne semble pas être bon. 
