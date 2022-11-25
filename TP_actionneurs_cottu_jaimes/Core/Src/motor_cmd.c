@@ -1,7 +1,7 @@
 /**
  * \file motor_cmd.c
  * \brief Fichier contenant les fonctions de gestion du moteur
- * \date 25/10/2022*
+ * \date 25/11/2022*
  *
  * \author Baptiste Cottu , Diego jaimes
  */
@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 #define GRADATION_UN_POURCENT 17			//!< Montée en douceur tout les 1%. (17 correspond à un rapport cyclique de 1%)
-#define DELAY_GRADATION 400					// delay entre chaque gradation de vitesse (en ms)
+#define DELAY_GRADATION 400					//!< Delay entre chaque gradation de vitesse (en ms)
 
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
@@ -23,6 +23,8 @@ uint8_t current=0;
 /**
  * \fn void motor_start(void)
  * \brief Met la Pin ISO_RESET à 1 pendant le temps requis (1ms).
+ *
+ * \retval void
  */
 void motor_start(void){
 	motor_stop_PWM();
@@ -35,8 +37,8 @@ void motor_start(void){
 
 /**
   * \fn void motor_stop_PWM(void)
-  * \brief Etteint toutes les PWM du moteur, et remet les valeur standarts (rapport cyclique de 660)
-  *
+  * \brief Etteint toutes les PWM du moteur, et remet le rapport cyclique a 50%
+  * \retval void
   */
 void motor_stop_PWM(void){
 	//printf("moteur_stop_entered\r\n");						// debogage
@@ -44,14 +46,15 @@ void motor_stop_PWM(void){
 	HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1);
 	HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_2);
-	TIM1->CCR1=850;
-	TIM1->CCR2=SPEED_MAX-850;
+	TIM1->CCR1=875;
+	TIM1->CCR2=SPEED_MAX-875;
 	HAL_TIM_PWM_Init(&htim1);
 }
 
 /**
  * \fn void motor_start_PWM(void)
  * \brief Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois
+ * \retval void
  */
 void motor_start_PWM(void){
 	//printf("start_PWM\r\n");									// debogage
@@ -61,12 +64,14 @@ void motor_start_PWM(void){
 	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
 }
 
+
 /**
- * \fn void motor_set_speed(int *speed)
+ * \fn void motor_set_speed(int speed)
  * \brief Récupère et traite la commande de vitesse du moteur. Il y a une méthode bourin, qui met directement le rapport cyclique voulu
  * dans les registres, mais qui cause un 'HALL OVERCURRENT'.
- *
- * La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur.
+ * La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur. La  durée
+ * entre chaque gradation est réglable grâce à la macro DELAY_GRADATION
+ * \retval void
  */
 void motor_set_speed(int speed){
 	//printf("motor_speed_entered\r\n");							// debogage
@@ -88,7 +93,7 @@ void motor_set_speed(int speed){
 	int rapport_cyclique=0;
 
 	// en montée
-	rapport_cyclique= TIM1->CCR1;						//<! prise en compte de la vitesse actuelle
+	rapport_cyclique= TIM1->CCR1;						// prise en compte de la vitesse actuelle
 	if (speed>rapport_cyclique){
 		while(rapport_cyclique<speed){
 			TIM1->CCR1=rapport_cyclique;
@@ -115,6 +120,14 @@ void motor_set_speed(int speed){
 	}
 }
 
+/**
+ * \fn void motor_get_current(void)
+ * \brief Récupère le courant passant dans la phase jaune du moteur. Cette fonction renvoie la valeur du courant en ampères.
+ *
+ * La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur. La  durée
+ * entre chaque gradation est réglable grâce à la macro DELAY_GRADATION
+ * \retval void
+ */
 void motor_get_current(void){
 	printf("motor_get_current_entered\r\n");
 	int rapport_cyclique= TIM1->CCR1;
@@ -130,5 +143,5 @@ void motor_get_current(void){
 	}
 	current=HAL_ADC_GetValue(&hadc1);
 	float real_current=(0.009*current);
-	printf("Current : %f \r\n",real_current);
+	printf("Current : %f A\r\n",real_current);
 }

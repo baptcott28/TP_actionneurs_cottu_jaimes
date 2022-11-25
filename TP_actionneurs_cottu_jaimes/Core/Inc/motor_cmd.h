@@ -1,8 +1,9 @@
-/*
- * motor_cmd.h
+/**
+ * \file motor_cmd.h
+ * \brief Fichier contenant les définitions necessaire au moteur.
+ * \date 25/11/2022*
  *
- *  Created on: Oct 25, 2022
- *      Author: bapti
+ * \author Baptiste Cottu , Diego jaimes
  */
 
 #include "main.h"

@@ -1494,3 +1494,33 @@ java.io.FileNotFoundException: C:\Users\bapti\Documents\GitHub\TP_actionneurs_co
 
 !ENTRY com.st.stm32cube.ide.mcu.debug 4 0 2022-11-24 12:06:44.209
 !MESSAGE Existing sessions are:
+!SESSION 2022-11-25 13:50:32.748 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=fr_FR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\bapti\Documents\GitHub\TP_actionneurs_cottu_jaimes
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-11-25 13:50:39.137
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-11-25 13:50:39.229
+!MESSAGE Log4j initialized with config file C:\Users\bapti\Documents\GitHub\TP_actionneurs_cottu_jaimes\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-25 13:50:52.546
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2022-11-25 21:58:31.957 -----------------------------------------------
+eclipse.buildId=Version 1.10.1
+java.version=11.0.14.1
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=fr_FR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-11-25 21:58:47.964
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-11-25 21:58:48.136
+!MESSAGE Log4j initialized with config file C:\Users\bapti\Documents\GitHub\TP_actionneurs_cottu_jaimes\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-11-25 21:59:03.501
+!MESSAGE Started RMI Server, listening on port 41337

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['_5fsbrk_0',['_sbrk',['../sysmem_8c.html#a68125648bcce70b6bb3aa0be50e99700',1,'sysmem.c']]]
+  ['busfault_5fhandler_0',['BusFault_Handler',['../stm32g4xx__it_8c.html#a850cefb17a977292ae5eb4cafa9976c3',1,'stm32g4xx_it.c']]]
 ];

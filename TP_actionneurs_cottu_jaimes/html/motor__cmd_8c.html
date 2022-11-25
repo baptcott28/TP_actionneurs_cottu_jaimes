@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Core/Src/motor_cmd.c File Reference</title>
+<title>TP_actionneur_cottu_jaimes: Core/Src/motor_cmd.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">My Project
+   <div id="projectname">TP_actionneur_cottu_jaimes
    </div>
   </td>
  </tr>
@@ -83,33 +83,39 @@ $(function() {
 
 <p>Fichier contenant les fonctions de gestion du moteur.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;motor_cmd.h&quot;</code><br />
-<code>#include &quot;main.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="motor__cmd_8h_source.html">motor_cmd.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="main_8h_source.html">main.h</a>&quot;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ad7c86544bbb397ff14a6bb7f288f63a0"><td class="memItemLeft" align="right" valign="top"><a id="ad7c86544bbb397ff14a6bb7f288f63a0" name="ad7c86544bbb397ff14a6bb7f288f63a0"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>SPEED_MAX</b>&#160;&#160;&#160;1740</td></tr>
-<tr class="memdesc:ad7c86544bbb397ff14a6bb7f288f63a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vitesse maximale que peut atteindre le moteur. Ici, 1750 est le raport cyclique égal à 1, on empêche cette valeur d'être atteinte et dépassée en limittant la consigne de vitesse à 1740. <br /></td></tr>
-<tr class="separator:ad7c86544bbb397ff14a6bb7f288f63a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36e3569df8b5bcf8d217ce613738e616"><td class="memItemLeft" align="right" valign="top"><a id="a36e3569df8b5bcf8d217ce613738e616" name="a36e3569df8b5bcf8d217ce613738e616"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MONTEE_CINQ_POURCENT</b>&#160;&#160;&#160;87</td></tr>
-<tr class="memdesc:a36e3569df8b5bcf8d217ce613738e616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Montée en douceur tout les 5%. (87 corespond à un raport cyclique de 5%) <br /></td></tr>
-<tr class="separator:a36e3569df8b5bcf8d217ce613738e616"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4633f7d4a7b335ba9c8770949b0889fc"><td class="memItemLeft" align="right" valign="top"><a id="a4633f7d4a7b335ba9c8770949b0889fc" name="a4633f7d4a7b335ba9c8770949b0889fc"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>GRADATION_UN_POURCENT</b>&#160;&#160;&#160;17</td></tr>
+<tr class="memdesc:a4633f7d4a7b335ba9c8770949b0889fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Montée en douceur tout les 1%. (17 correspond à un rapport cyclique de 1%) <br /></td></tr>
+<tr class="separator:a4633f7d4a7b335ba9c8770949b0889fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae71e28d9055fc5372e976bf26dab97ae"><td class="memItemLeft" align="right" valign="top"><a id="ae71e28d9055fc5372e976bf26dab97ae" name="ae71e28d9055fc5372e976bf26dab97ae"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>DELAY_GRADATION</b>&#160;&#160;&#160;400</td></tr>
+<tr class="memdesc:ae71e28d9055fc5372e976bf26dab97ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delay entre chaque gradation de vitesse (en ms) <br /></td></tr>
+<tr class="separator:ae71e28d9055fc5372e976bf26dab97ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af473ccc694c3f7b4e5ac3f1d771f8389"><td class="memItemLeft" align="right" valign="top"><a id="af473ccc694c3f7b4e5ac3f1d771f8389" name="af473ccc694c3f7b4e5ac3f1d771f8389"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>motor_start</b> (void)</td></tr>
-<tr class="memdesc:af473ccc694c3f7b4e5ac3f1d771f8389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Démarre le timer 2 et met la Pin ISO_RESET à 1 pendant le temps requis (2us). Le reset de ISO_RESET se fait dans l'interruption de tim2. <br /></td></tr>
+<tr class="memitem:af473ccc694c3f7b4e5ac3f1d771f8389"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="motor__cmd_8c.html#af473ccc694c3f7b4e5ac3f1d771f8389">motor_start</a> (void)</td></tr>
+<tr class="memdesc:af473ccc694c3f7b4e5ac3f1d771f8389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Met la Pin ISO_RESET à 1 pendant le temps requis (1ms).  <a href="motor__cmd_8c.html#af473ccc694c3f7b4e5ac3f1d771f8389">More...</a><br /></td></tr>
 <tr class="separator:af473ccc694c3f7b4e5ac3f1d771f8389"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed532a94760860e2ea3ec907b4738c5c"><td class="memItemLeft" align="right" valign="top"><a id="aed532a94760860e2ea3ec907b4738c5c" name="aed532a94760860e2ea3ec907b4738c5c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>motor_start_PWM</b> (void)</td></tr>
-<tr class="memdesc:aed532a94760860e2ea3ec907b4738c5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois. <br /></td></tr>
+<tr class="memitem:a2b25f6dbf6270d6cbfc08513e4f8040b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="motor__cmd_8c.html#a2b25f6dbf6270d6cbfc08513e4f8040b">motor_stop_PWM</a> (void)</td></tr>
+<tr class="memdesc:a2b25f6dbf6270d6cbfc08513e4f8040b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Etteint toutes les PWM du moteur, et remet le rapport cyclique a 50%.  <a href="motor__cmd_8c.html#a2b25f6dbf6270d6cbfc08513e4f8040b">More...</a><br /></td></tr>
+<tr class="separator:a2b25f6dbf6270d6cbfc08513e4f8040b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed532a94760860e2ea3ec907b4738c5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="motor__cmd_8c.html#aed532a94760860e2ea3ec907b4738c5c">motor_start_PWM</a> (void)</td></tr>
+<tr class="memdesc:aed532a94760860e2ea3ec907b4738c5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois.  <a href="motor__cmd_8c.html#aed532a94760860e2ea3ec907b4738c5c">More...</a><br /></td></tr>
 <tr class="separator:aed532a94760860e2ea3ec907b4738c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3aeeac79071216948975bbc2eb044765"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="motor__cmd_8c.html#a3aeeac79071216948975bbc2eb044765">motor_set_speed</a> (int *<a class="el" href="main_8c.html#aa172f651f8d3a4de9c8864e23eb3324e">speed</a>)</td></tr>
-<tr class="memdesc:a3aeeac79071216948975bbc2eb044765"><td class="mdescLeft">&#160;</td><td class="mdescRight">Récupère et traite la commande de vitesse du moteur.  <a href="motor__cmd_8c.html#a3aeeac79071216948975bbc2eb044765">More...</a><br /></td></tr>
-<tr class="separator:a3aeeac79071216948975bbc2eb044765"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33552e9325583ca2f42dd02ce0f1a894"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="motor__cmd_8c.html#a33552e9325583ca2f42dd02ce0f1a894">motor_set_speed</a> (int speed)</td></tr>
+<tr class="memdesc:a33552e9325583ca2f42dd02ce0f1a894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Récupère et traite la commande de vitesse du moteur. Il y a une méthode bourin, qui met directement le rapport cyclique voulu dans les registres, mais qui cause un 'HALL OVERCURRENT'. La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur. La durée entre chaque gradation est réglable grâce à la macro DELAY_GRADATION.  <a href="motor__cmd_8c.html#a33552e9325583ca2f42dd02ce0f1a894">More...</a><br /></td></tr>
+<tr class="separator:a33552e9325583ca2f42dd02ce0f1a894"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7e98ae75c1078c276ce06328127d2de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="motor__cmd_8c.html#ad7e98ae75c1078c276ce06328127d2de">motor_get_current</a> (void)</td></tr>
+<tr class="memdesc:ad7e98ae75c1078c276ce06328127d2de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Récupère le courant passant dans la phase jaune du moteur. Cette fonction renvoie la valeur du courant en ampères.  <a href="motor__cmd_8c.html#ad7e98ae75c1078c276ce06328127d2de">More...</a><br /></td></tr>
+<tr class="separator:ad7e98ae75c1078c276ce06328127d2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -119,18 +125,46 @@ TIM_HandleTypeDef&#160;</td><td class="memItemRight" valign="bottom"><b>htim1</b
 <tr class="memitem:a2c80fd5510e2990a59a5c90d745c716c"><td class="memItemLeft" align="right" valign="top"><a id="a2c80fd5510e2990a59a5c90d745c716c" name="a2c80fd5510e2990a59a5c90d745c716c"></a>
 TIM_HandleTypeDef&#160;</td><td class="memItemRight" valign="bottom"><b>htim2</b></td></tr>
 <tr class="separator:a2c80fd5510e2990a59a5c90d745c716c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a094e9803427776b04b0106d239e0c7f2"><td class="memItemLeft" align="right" valign="top"><a id="a094e9803427776b04b0106d239e0c7f2" name="a094e9803427776b04b0106d239e0c7f2"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>speed</b> [SPEED_MAX_DIGIT]</td></tr>
-<tr class="memdesc:a094e9803427776b04b0106d239e0c7f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buffer contenant les digits de la commande de vitesse moteur. <br /></td></tr>
-<tr class="separator:a094e9803427776b04b0106d239e0c7f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22b804736f5648d52f639b2647d4ed13"><td class="memItemLeft" align="right" valign="top"><a id="a22b804736f5648d52f639b2647d4ed13" name="a22b804736f5648d52f639b2647d4ed13"></a>
+ADC_HandleTypeDef&#160;</td><td class="memItemRight" valign="bottom"><b>hadc1</b></td></tr>
+<tr class="separator:a22b804736f5648d52f639b2647d4ed13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50f63c1ee4d6aebea66e795845c5aba5"><td class="memItemLeft" align="right" valign="top"><a id="a50f63c1ee4d6aebea66e795845c5aba5" name="a50f63c1ee4d6aebea66e795845c5aba5"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>current</b> =0</td></tr>
+<tr class="separator:a50f63c1ee4d6aebea66e795845c5aba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Fichier contenant les fonctions de gestion du moteur. </p>
-<dl class="section date"><dt>Date</dt><dd>25/10/2022*</dd></dl>
+<dl class="section date"><dt>Date</dt><dd>25/11/2022*</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Baptiste Cottu , Diego jaimes </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a3aeeac79071216948975bbc2eb044765" name="a3aeeac79071216948975bbc2eb044765"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3aeeac79071216948975bbc2eb044765">&#9670;&#160;</a></span>motor_set_speed()</h2>
+<a id="ad7e98ae75c1078c276ce06328127d2de" name="ad7e98ae75c1078c276ce06328127d2de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7e98ae75c1078c276ce06328127d2de">&#9670;&#160;</a></span>motor_get_current()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void motor_get_current </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Récupère le courant passant dans la phase jaune du moteur. Cette fonction renvoie la valeur du courant en ampères. </p>
+<p >La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur. La durée entre chaque gradation est réglable grâce à la macro DELAY_GRADATION </p><dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">void</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a33552e9325583ca2f42dd02ce0f1a894" name="a33552e9325583ca2f42dd02ce0f1a894"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33552e9325583ca2f42dd02ce0f1a894">&#9670;&#160;</a></span>motor_set_speed()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -138,15 +172,98 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>speed</b> [SPEED_M
         <tr>
           <td class="memname">void motor_set_speed </td>
           <td>(</td>
-          <td class="paramtype">int *&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>speed</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Récupère et traite la commande de vitesse du moteur. </p>
-<p >&lt; Rapport cyclique initial à 5%</p>
+<p>Récupère et traite la commande de vitesse du moteur. Il y a une méthode bourin, qui met directement le rapport cyclique voulu dans les registres, mais qui cause un 'HALL OVERCURRENT'. La deuxième methode est une méthode de gradation, qui permet d'augmenter ou de diminuer en douceur le rapport cyclique du moteur. La durée entre chaque gradation est réglable grâce à la macro DELAY_GRADATION. </p>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">void</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af473ccc694c3f7b4e5ac3f1d771f8389" name="af473ccc694c3f7b4e5ac3f1d771f8389"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af473ccc694c3f7b4e5ac3f1d771f8389">&#9670;&#160;</a></span>motor_start()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void motor_start </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Met la Pin ISO_RESET à 1 pendant le temps requis (1ms). </p>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">void</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aed532a94760860e2ea3ec907b4738c5c" name="aed532a94760860e2ea3ec907b4738c5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed532a94760860e2ea3ec907b4738c5c">&#9670;&#160;</a></span>motor_start_PWM()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void motor_start_PWM </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fonction de racourci pour éviter de réécrire le redémarage des PWM à chaque fois. </p>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">void</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2b25f6dbf6270d6cbfc08513e4f8040b" name="a2b25f6dbf6270d6cbfc08513e4f8040b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b25f6dbf6270d6cbfc08513e4f8040b">&#9670;&#160;</a></span>motor_stop_PWM()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void motor_stop_PWM </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Etteint toutes les PWM du moteur, et remet le rapport cyclique a 50%. </p>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">void</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
